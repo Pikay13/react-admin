@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Box, FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 import data from "../mock/dummyTransactions";
 import formatDate from "../utils/formatDate";
@@ -33,7 +33,7 @@ const DateFilter = (props) => {
       <FormControl
         sx={{
           minWidth: 120,
-          margin: "1rem 1rem",
+          margin: "1rem 2rem",
           ".css-11u53oe-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input":
             {
               padding: ".8rem .725rem",
@@ -58,7 +58,7 @@ const DateFilter = (props) => {
       <FormControl
         sx={{
           minWidth: 120,
-          margin: "1rem 1rem",
+          margin: "1rem 2rem",
           ".css-11u53oe-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input":
             {
               padding: ".8rem .725rem",

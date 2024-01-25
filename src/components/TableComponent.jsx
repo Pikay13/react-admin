@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Box,
   Button,
-  Checkbox,
   Paper,
   Table,
   TableBody,
@@ -16,14 +15,15 @@ import {
   TableHead,
 } from "@mui/material";
 import data from "../mock/dummyTransactions";
-import IconButton from "@mui/material/IconButton";
-import DeleteIcon from "@mui/icons-material/Delete";
 import formatDate from "../utils/formatDate";
 import DateFilter from "./DateFilter";
 import BranchFilter from "./BranchFilter";
 import TypeFilter from "./TypeFilter";
 import StatusFilter from "./StatusFilter";
 import tableHeaders from "../mock/tableHeaders";
+import SeacrhBar from "./SearchBar";
+import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
+import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 
 const TableComponent = () => {
   const [selected, setSelected] = useState([]);
@@ -31,6 +31,13 @@ const TableComponent = () => {
 
   function EnhancedTableToolbar(props) {
     const { numSelected } = props;
+    const handleDelete = () => {
+      selected.forEach((ele) => {
+        const filteredData = newData.filter((item) => item.id !== ele);
+        setNewData(filteredData);
+        setSelected([]);
+      });
+    };
 
     return (
       <Box sx={{ display: "flex", justifyContent: "space-between" }}>
@@ -65,28 +72,25 @@ const TableComponent = () => {
           )}
 
           {numSelected > 0 ? (
-            <Tooltip title="Delete" sx={{}}>
-              <IconButton
-                sx={{
-                  color: "#e31837",
-                  // mr: { xs: "1rem", sm: "3rem", md: "3rem", xl: "3rem" },
-                }}
-              >
-                <DeleteIcon />
-              </IconButton>
-            </Tooltip>
+            <Button
+              variant="contained"
+              sx={{
+                margin: "auto 1rem",
+                background: "#e31837",
+                "&:hover": {
+                  background: "#e31832",
+                },
+              }}
+              onClick={handleDelete}
+            >
+              Delete
+            </Button>
           ) : null}
         </Toolbar>
-
-        <DateFilter setNewData={setNewData} />
-        <BranchFilter setNewData={setNewData} />
-        <TypeFilter setNewData={setNewData} />
-        <StatusFilter setNewData={setNewData} />
+        <SeacrhBar setNewData={setNewData} />
         <Button
           variant="contained"
           sx={{
-            height: "2rem",
-            width: "1.5rem",
             margin: "auto 1rem",
             background: "#231f20",
             "&:hover": {
@@ -124,6 +128,16 @@ const TableComponent = () => {
     setSelected(newSelected);
   };
 
+  const handleAscSorting = () => {
+    const sortedData = data.sort((a, b) => a.date - b.date);
+    setNewData(sortedData);
+  };
+
+  const handleDescSorting = () => {
+    const sortedData = data.sort((a, b) => b.date - a.date);
+    setNewData(sortedData);
+  };
+
   const isSelected = (id) => selected.indexOf(id) !== -1;
 
   return (
@@ -137,18 +151,46 @@ const TableComponent = () => {
       <Paper sx={{ width: "100%", mb: 2 }}>
         <EnhancedTableToolbar numSelected={selected.length} />
         <Divider />
+        <Box className="filter-container">
+          <Tooltip>
+            <Typography variant="h6">Total {`(${newData.length})`}</Typography>
+          </Tooltip>
+          <DateFilter setNewData={setNewData} />
+          <BranchFilter setNewData={setNewData} />
+          <TypeFilter setNewData={setNewData} />
+          <StatusFilter setNewData={setNewData} />
+        </Box>
         <Divider />
         <TableContainer>
           <Table
-            sx={{ minWidth: 750, padding: "1rem 1rem" }}
+            sx={{
+              minWidth: 750,
+              padding: "1rem 1rem",
+            }}
             aria-labelledby="tableTitle"
             size="medium"
           >
             <TableHead>
-              <TableRow>
+              <TableRow
+                sx={{
+                  background: "#e9e9e9",
+                }}
+              >
                 {tableHeaders.map((column) => (
-                  <TableCell key={column.id} align={"center"}>
+                  <TableCell key={column.id} align="center">
+                    {column.label === "Date" && (
+                      <ArrowUpwardIcon
+                        style={{ fontSize: "1.25rem" }}
+                        onClick={handleAscSorting}
+                      />
+                    )}
                     {column.label}
+                    {column.label === "Date" && (
+                      <ArrowDownwardIcon
+                        style={{ fontSize: "1.25rem" }}
+                        onClick={handleDescSorting}
+                      />
+                    )}
                   </TableCell>
                 ))}
               </TableRow>
@@ -156,7 +198,6 @@ const TableComponent = () => {
             <TableBody>
               {newData.map((row) => {
                 const isItemSelected = isSelected(row.id);
-
                 return (
                   <TableRow
                     hover
